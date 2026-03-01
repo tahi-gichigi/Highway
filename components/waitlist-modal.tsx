@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createClient } from "@/lib/supabase/client"
 import { Check, Loader2 } from 'lucide-react'
 
 interface WaitlistModalProps {
@@ -31,18 +30,16 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
     setError(null)
 
     try {
-      const supabase = createClient()
-      const { error: insertError } = await supabase
-        .from("waitlist_entries")
-        .insert({ email })
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
 
-      if (insertError) {
-        if (insertError.code === "23505") {
-          // Unique constraint violation
-          setError("This email is already on the waitlist!")
-        } else {
-          throw insertError
-        }
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.")
         return
       }
 
@@ -57,7 +54,7 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
         }, 300)
       }, 2000)
     } catch (err) {
-      console.error("[v0] Waitlist signup error:", err)
+      console.error("Waitlist signup error:", err)
       setError("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
