@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const sql = neon(process.env.DATABASE_URL!)
+    const sql = neon(process.env.POSTGRES_URL!)
 
     await sql`
       INSERT INTO waitlist_entries (email)

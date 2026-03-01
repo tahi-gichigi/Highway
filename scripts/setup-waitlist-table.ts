@@ -12,7 +12,7 @@ for (const line of envFile.split("\n")) {
 }
 
 async function setup() {
-  const sql = neon(process.env.DATABASE_URL!)
+  const sql = neon(process.env.POSTGRES_URL!)
 
   await sql`
     CREATE TABLE IF NOT EXISTS waitlist_entries (
